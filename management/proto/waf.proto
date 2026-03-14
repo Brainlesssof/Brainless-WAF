@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package waf;
+
+service WafControl {
+    rpc ReloadRules (ReloadRequest) returns (ReloadResponse);
+    rpc UpdateConfig (ConfigRequest) returns (ConfigResponse);
+}
+
+message ReloadRequest {
+    repeated int32 rule_ids = 1;
+}
+
+message ReloadResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message ConfigRequest {
+    string key = 1;
+    string value_json = 2;
+}
+
+message ConfigResponse {
+    bool success = 1;
+    string message = 2;
+}

@@ -1,0 +1,25 @@
+[project]
+name = "brainless-waf-management"
+version = "0.1.0"
+description = "Management API for Brainless WAF"
+authors = [
+    {name = "Brainless Security Community", email = "community@brainless-security.io"}
+]
+dependencies = [
+    "fastapi>=0.100.0",
+    "uvicorn[standard]>=0.22.0",
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.11.0",
+    "psycopg2-binary>=2.9.6",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.4",
+    "python-multipart>=0.0.6",
+    "grpcio>=1.54.0",
+    "grpcio-tools>=1.54.0",
+    "pydantic-settings>=2.0.0",
+    "pydantic[email]>=2.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.setuptools]
+packages = ["app"]
