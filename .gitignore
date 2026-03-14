@@ -1,0 +1,6 @@
+dashboard/node_modules/
+dashboard/dist/
+dashboard/coverage/
+dashboard/*.tsbuildinfo
+dashboard/*.d.ts
+dashboard/vite.config.js

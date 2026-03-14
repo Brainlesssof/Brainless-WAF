@@ -28,6 +28,20 @@ services:
     volumes:
       - ./management:/app
 
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: bwaf-dashboard
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+    depends_on:
+      - management
+    volumes:
+      - ./dashboard:/app
+
   mock-backend:
     image: kennethreitz/httpbin
     container_name: bwaf-mock-backend

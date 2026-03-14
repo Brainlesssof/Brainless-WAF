@@ -1,0 +1,56 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, "Segoe UI", sans-serif;
+  --color-canvas: #07111f;
+  --color-panel: rgba(11, 22, 38, 0.82);
+  --color-panel-strong: rgba(17, 31, 51, 0.94);
+  --color-panel-border: rgba(162, 184, 213, 0.14);
+  --color-accent: #7dd3fc;
+  --color-accent-strong: #38bdf8;
+  --color-success: #4ade80;
+  --color-warning: #f59e0b;
+  --color-critical: #fb7185;
+  --color-info: #60a5fa;
+  --color-text: #edf4ff;
+  --color-text-muted: rgba(237, 244, 255, 0.68);
+  --shadow-panel: 0 28px 90px rgba(4, 10, 22, 0.44);
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 999px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+  --text-display: clamp(2.75rem, 6vw, 4.9rem);
+  --text-heading: clamp(1.35rem, 2vw, 1.85rem);
+  --text-body: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(251, 113, 133, 0.12), transparent 30%),
+    linear-gradient(180deg, #07111f 0%, #040913 100%);
+  color: var(--color-text);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}

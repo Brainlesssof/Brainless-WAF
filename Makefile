@@ -3,6 +3,7 @@
 # Variables
 MANAGEMENT_DIR=management
 CORE_DIR=core
+DASHBOARD_DIR=dashboard
 DOCKER_COMPOSE=docker-compose.dev.yml
 
 # Default target
@@ -12,18 +13,21 @@ all: build
 build:
 	@echo "Building all components..."
 	cd $(MANAGEMENT_DIR) && pip install .
+	cd $(DASHBOARD_DIR) && npm ci && npm run build
 	# cd $(CORE_DIR) && go build -o brainless-waf
 
 # Run tests
 test:
 	@echo "Running tests..."
 	cd $(MANAGEMENT_DIR) && pytest
+	cd $(DASHBOARD_DIR) && npm ci && npm run test -- --run
 	# cd $(CORE_DIR) && go test ./...
 
 # Linting
 lint:
 	@echo "Running linters..."
 	cd $(MANAGEMENT_DIR) && flake8 .
+	cd $(DASHBOARD_DIR) && npm ci && npm run lint && npm run type-check
 	# cd $(CORE_DIR) && golangci-lint run
 
 # Docker
