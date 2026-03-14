@@ -21,7 +21,7 @@ This document tracks the granular progress of the Brainless WAF project, organiz
 
 | Task ID | Description | [DEV] | [TEST] | [GIT] | Status |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| 1.1 | v0.1 Skeleton & Basic Reverse Proxy | [x] | [ ] | [x] | IN PROGRESS |
+| 1.1 | v0.1 Skeleton & Basic Reverse Proxy | [x] | [x] | [x] | COMPLETED |
 | 1.2 | v0.2 Request Parsing & Normalization | [ ] | [ ] | [ ] | PLANNED |
 | 1.3 | v0.3 Rule Engine MVP (BRF Parser) | [ ] | [ ] | [ ] | PLANNED |
 | 1.4 | v0.4 Anomaly Scoring & Stateful Logic | [ ] | [ ] | [ ] | PLANNED |
