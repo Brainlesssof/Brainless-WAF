@@ -4,19 +4,22 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
 
 	"github.com/brainless-security/brainless-waf/core/pkg/common"
+	"github.com/brainless-security/brainless-waf/core/pkg/limiter"
 	"github.com/brainless-security/brainless-waf/core/pkg/rules"
 )
 
 type WAFProxy struct {
-	target *url.URL
-	proxy  *httputil.ReverseProxy
-	parser *Parser
-	engine *rules.Engine
+	target  *url.URL
+	proxy   *httputil.ReverseProxy
+	parser  *Parser
+	engine  *rules.Engine
+	limiter *limiter.IPVoiceLimiter
 }
 
-func NewWAFProxy(targetURL string, engine *rules.Engine) (*WAFProxy, error) {
+func NewWAFProxy(targetURL string, engine *rules.Engine, l *limiter.IPVoiceLimiter) (*WAFProxy, error) {
 	target, err := url.Parse(targetURL)
 	if err != nil {
 		return nil, err
@@ -25,14 +28,24 @@ func NewWAFProxy(targetURL string, engine *rules.Engine) (*WAFProxy, error) {
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
 	return &WAFProxy{
-		target: target,
-		proxy:  proxy,
-		parser: NewParser(),
-		engine: engine,
+		target:  target,
+		proxy:   proxy,
+		parser:  NewParser(),
+		engine:  engine,
+		limiter: l,
 	}, nil
 }
 
 func (p *WAFProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// 0. Rate Limiting
+	if p.limiter != nil {
+		ip := strings.Split(r.RemoteAddr, ":")[0]
+		if !p.limiter.Allow(ip) {
+			http.Error(w, "Too Many Requests", http.StatusTooManyRequests)
+			return
+		}
+	}
+
 	// 1. Initialize security transaction
 	tx := common.NewTransaction(r)
 

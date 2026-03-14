@@ -1,0 +1,13 @@
+server:
+  listen: ":80"
+  upstream: "http://bwaf-mock-backend:80"
+  tls:
+    enabled: false
+    cert_file: "/app/certs/tls.crt"
+    key_file: "/app/certs/tls.key"
+    listen_tls: ":443"
+
+rate_limiting:
+  enabled: true
+  rps: 100
+  burst: 200
