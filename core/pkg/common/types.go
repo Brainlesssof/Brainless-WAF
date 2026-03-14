@@ -18,17 +18,19 @@ type Transaction struct {
 
 	// Security metadata
 	AnomalyScore int
-	Action       string // deny, allow, log, pass
-	MatchedRules []int  // Rule IDs
+	Variables    map[string]string // Transactional variables (TX:name)
+	Action       string            // deny, allow, log, pass
+	MatchedRules []int             // Rule IDs
 }
 
 func NewTransaction(r *http.Request) *Transaction {
 	id := r.Header.Get("X-Request-ID")
 	return &Transaction{
-		ID:      id,
-		Request: r,
-		Headers: make(http.Header),
-		Args:    make(url.Values),
-		Action:  "allow", // Default to allow
+		ID:        id,
+		Request:   r,
+		Headers:   make(http.Header),
+		Args:      make(url.Values),
+		Variables: make(map[string]string),
+		Action:    "allow", // Default to allow
 	}
 }

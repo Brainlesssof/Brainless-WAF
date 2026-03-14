@@ -53,6 +53,7 @@ func (p *Parser) ParseFile(path string) ([]Rule, error) {
 			Operator: operator,
 			Operand:  operand,
 			Status:   403, // Default
+			SetVars:  make(map[string]string),
 		}
 
 		// Compile regex if operator is rx
@@ -76,6 +77,13 @@ func (p *Parser) ParseFile(path string) ([]Rule, error) {
 			} else if strings.HasPrefix(a, "status:") {
 				status, _ := strconv.Atoi(strings.TrimPrefix(a, "status:"))
 				rule.Status = status
+			} else if strings.HasPrefix(a, "severity:") {
+				rule.Severity = strings.ToUpper(strings.TrimPrefix(a, "severity:"))
+			} else if strings.HasPrefix(a, "setvar:") {
+				varParts := strings.Split(strings.TrimPrefix(a, "setvar:"), "=")
+				if len(varParts) == 2 {
+					rule.SetVars[varParts[0]] = varParts[1]
+				}
 			} else {
 				rule.Actions = append(rule.Actions, a)
 			}

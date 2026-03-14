@@ -52,3 +52,39 @@ func TestRuleEvaluation(t *testing.T) {
 		t.Errorf("Expected no rules to match")
 	}
 }
+
+func TestAnomalyScoring(t *testing.T) {
+	engine := NewEngine()
+
+	engine.Rules = []Rule{
+		{
+			ID:       2001,
+			Variable: "ARGS",
+			Operator: "contains",
+			Operand:  "vuln1",
+			SetVars:  map[string]string{"tx.anomaly_score": "+5"},
+			Actions:  []string{"pass"},
+		},
+		{
+			ID:       2002,
+			Variable: "ARGS",
+			Operator: "contains",
+			Operand:  "vuln2",
+			SetVars:  map[string]string{"tx.anomaly_score": "+7"},
+			Actions:  []string{"pass"},
+		},
+	}
+
+	req := httptest.NewRequest("GET", "/?a=vuln1&b=vuln2", nil)
+	tx := common.NewTransaction(req)
+	tx.Args = req.URL.Query()
+
+	engine.Evaluate(tx)
+
+	if tx.AnomalyScore != 12 {
+		t.Errorf("Expected anomaly score 12, got %d", tx.AnomalyScore)
+	}
+	if len(tx.MatchedRules) != 2 {
+		t.Errorf("Expected 2 matched rules, got %d", len(tx.MatchedRules))
+	}
+}

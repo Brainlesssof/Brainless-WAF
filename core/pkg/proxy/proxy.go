@@ -45,8 +45,17 @@ func (p *WAFProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// 3. Evaluate rules
 	if p.engine != nil {
 		result := p.engine.Evaluate(tx)
+
+		// Handle immediate deny actions
 		if result.Matched && result.Action == "deny" {
 			http.Error(w, result.Message, result.Status)
+			return
+		}
+
+		// Handle Anomaly Scoring threshold
+		// Default threshold = 10 (should be configurable)
+		if tx.AnomalyScore >= 10 {
+			http.Error(w, "Inbound Anomaly Score Exceeded", http.StatusForbidden)
 			return
 		}
 	}

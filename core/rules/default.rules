@@ -1,10 +1,11 @@
 # Default security rules for Brainless WAF
 
-# Block SQL injection attempts in arguments
-SecRule ARGS "@rx (?i)(union|select|insert|update|delete|drop)" "id:1001,msg:'SQL Injection Attempt Detected',deny,status:403"
+# --- Inbound Anomaly Scoring Rules (Phase 2) ---
+# Low risk patterns increase the score
+SecRule ARGS "@rx (?i)(union|select|insert|update|delete|drop)" "id:1001,msg:'SQL Injection Attempt',severity:CRITICAL,setvar:tx.anomaly_score=+5"
+SecRule ARGS "@rx (?i)(<script|alert\(|onerror=)" "id:1002,msg:'XSS Attempt',severity:CRITICAL,setvar:tx.anomaly_score=+5"
+SecRule REQUEST_PATH "@rx ^/(admin|wp-admin|config|\.git)" "id:1003,msg:'Sensitive Path Access Attempt',severity:HIGH,setvar:tx.anomaly_score=+3"
 
-# Block common XSS patterns in arguments
-SecRule ARGS "@rx (?i)(<script|alert\(|onerror=)" "id:1002,msg:'XSS Attempt Detected',deny,status:403"
-
-# Block attempts to access sensitive paths
-SecRule REQUEST_PATH "@rx ^/(admin|wp-admin|config|\.git)" "id:1003,msg:'Sensitive Path Access Attempt',deny,status:403"
+# --- Immediate Blocking Rules (Phase 1) ---
+# Block critical threats immediately if needed
+SecRule ARGS "@rx (?i)(etc/passwd|/bin/sh)" "id:1004,msg:'Local File Inclusion / RCE Attempt',deny,status:403"

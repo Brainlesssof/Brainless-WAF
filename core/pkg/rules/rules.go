@@ -1,7 +1,9 @@
 package rules
 
 import (
+	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/brainless-security/brainless-waf/core/pkg/common"
@@ -13,9 +15,11 @@ type Rule struct {
 	Variable string // ARGS, REQUEST_URI, HEADERS, REQUEST_BODY
 	Operator string // rx, contains, streq
 	Operand  string
-	Actions  []string // deny, allow, log, pass
+	Actions  []string          // deny, allow, log, pass
+	SetVars  map[string]string // tx.anomaly_score=+5
 	Message  string
-	Status   int // HTTP status code
+	Severity string // CRITICAL, HIGH, MEDIUM, LOW
+	Status   int    // HTTP status code
 
 	// Pre-compiled components
 	Rx *regexp.Regexp
@@ -61,6 +65,11 @@ func (e *Engine) Evaluate(tx *common.Transaction) Result {
 		if matched {
 			tx.MatchedRules = append(tx.MatchedRules, rule.ID)
 
+			// Handle setvar
+			for varName, action := range rule.SetVars {
+				e.applySetVar(tx, varName, action)
+			}
+
 			// Handle actions
 			for _, action := range rule.Actions {
 				if action == "deny" {
@@ -79,7 +88,30 @@ func (e *Engine) Evaluate(tx *common.Transaction) Result {
 	return Result{Matched: false, Action: "allow"}
 }
 
+func (e *Engine) applySetVar(tx *common.Transaction, varName, action string) {
+	// Support tx.anomaly_score=+N
+	if varName == "tx.anomaly_score" {
+		if strings.HasPrefix(action, "+") {
+			val, _ := strconv.Atoi(strings.TrimPrefix(action, "+"))
+			tx.AnomalyScore += val
+		} else {
+			val, _ := strconv.Atoi(action)
+			tx.AnomalyScore = val
+		}
+	} else {
+		tx.Variables[varName] = action
+	}
+}
+
 func (e *Engine) extractVariable(tx *common.Transaction, variable string) string {
+	if strings.HasPrefix(variable, "TX:") {
+		varKey := strings.ToLower(strings.TrimPrefix(variable, "TX:"))
+		if varKey == "anomaly_score" {
+			return fmt.Sprintf("%d", tx.AnomalyScore)
+		}
+		return tx.Variables[varKey]
+	}
+
 	switch variable {
 	case "REQUEST_URI":
 		return tx.NormalizedURL
