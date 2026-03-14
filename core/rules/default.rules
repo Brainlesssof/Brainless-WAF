@@ -1,0 +1,10 @@
+# Default security rules for Brainless WAF
+
+# Block SQL injection attempts in arguments
+SecRule ARGS "@rx (?i)(union|select|insert|update|delete|drop)" "id:1001,msg:'SQL Injection Attempt Detected',deny,status:403"
+
+# Block common XSS patterns in arguments
+SecRule ARGS "@rx (?i)(<script|alert\(|onerror=)" "id:1002,msg:'XSS Attempt Detected',deny,status:403"
+
+# Block attempts to access sensitive paths
+SecRule REQUEST_PATH "@rx ^/(admin|wp-admin|config|\.git)" "id:1003,msg:'Sensitive Path Access Attempt',deny,status:403"

@@ -1,4 +1,4 @@
-package proxy
+package common
 
 import (
 	"net/http"
@@ -24,13 +24,11 @@ type Transaction struct {
 
 func NewTransaction(r *http.Request) *Transaction {
 	id := r.Header.Get("X-Request-ID")
-	// If the core engine is behind a load balancer that already set an ID, we use it.
-	// Otherwise, this should be generated.
-
 	return &Transaction{
 		ID:      id,
 		Request: r,
 		Headers: make(http.Header),
 		Args:    make(url.Values),
+		Action:  "allow", // Default to allow
 	}
 }

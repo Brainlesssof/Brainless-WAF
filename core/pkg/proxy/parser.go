@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/brainless-security/brainless-waf/core/pkg/common"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -17,7 +18,7 @@ func NewParser() *Parser {
 }
 
 // Parse extracts and normalizes data from an http.Request into a Transaction.
-func (p *Parser) Parse(tx *Transaction) error {
+func (p *Parser) Parse(tx *common.Transaction) error {
 	r := tx.Request
 
 	// 1. Normalize Path and URL
