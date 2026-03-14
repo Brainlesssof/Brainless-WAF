@@ -394,6 +394,8 @@ In development, these are set via `.env` file (see `.env.example`).
 
 ### Migrations
 
+The management API schema is tracked with Alembic. Alembic uses `DATABASE_URL` when it is set, so the same commands work both locally and inside the development Docker stack.
+
 ```bash
 cd management
 
@@ -402,6 +404,9 @@ alembic upgrade head
 
 # Create a new migration
 alembic revision --autogenerate -m "add user preferences table"
+
+# Show the current revision
+alembic current
 
 # Downgrade one step
 alembic downgrade -1
@@ -415,6 +420,8 @@ alembic history --verbose
 ```bash
 make dev-db-reset    # Drop, recreate, and seed with test data
 ```
+
+If you are starting the management API against a fresh database outside the Make targets, run `alembic upgrade head` before launching `uvicorn`.
 
 ### Seed data
 

@@ -38,7 +38,7 @@ This document tracks the granular progress of the Brainless WAF project, organiz
 | 2.2 | Core Endpoints (Rules, Config, Health) | [x] | [ ] | [x] | COMPLETED |
 | 2.3 | Advanced Endpoints (Events, Stats, IP Lists) | [x] | [ ] | [x] | COMPLETED |
 | 2.4 | gRPC Bridge Notifier (WAF Sync) | [x] | [ ] | [x] | COMPLETED |
-| 2.5 | Database Migrations (Alembic) | [ ] | [ ] | [ ] | PLANNED |
+| 2.5 | Database Migrations (Alembic) | [x] | [/] | [x] | IN PROGRESS |
 
 ---
 
