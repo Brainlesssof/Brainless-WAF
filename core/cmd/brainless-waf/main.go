@@ -8,12 +8,14 @@ import (
 	"github.com/brainless-security/brainless-waf/core/pkg/limiter"
 	"github.com/brainless-security/brainless-waf/core/pkg/proxy"
 	"github.com/brainless-security/brainless-waf/core/pkg/rules"
+	"github.com/brainless-security/brainless-waf/core/pkg/telemetry"
 )
 
 func main() {
 	// Default values
 	listenAddr := ":80"
 	upstreamURL := "http://localhost:8080"
+	anomalyThreshold := 10
 	var cfg *common.Config
 
 	// Try to load config from file
@@ -22,10 +24,16 @@ func main() {
 		cfg = c
 		listenAddr = cfg.Server.Listen
 		upstreamURL = cfg.Server.Upstream
+		if cfg.Security.AnomalyThreshold > 0 {
+			anomalyThreshold = cfg.Security.AnomalyThreshold
+		}
 		log.Printf("Loaded configuration from config/config.yaml")
 	} else {
 		log.Printf("Using default bootstrap configuration (no config/config.yaml found)")
 	}
+
+	// Initialize Telemetry
+	secLogger := telemetry.NewLogger()
 
 	// Initialize Rate Limiter
 	var l *limiter.IPVoiceLimiter
@@ -45,7 +53,7 @@ func main() {
 		log.Printf("No rules loaded: %v", err)
 	}
 
-	wafProxy, err := proxy.NewWAFProxy(upstreamURL, engine, l)
+	wafProxy, err := proxy.NewWAFProxy(upstreamURL, engine, l, secLogger, anomalyThreshold)
 	if err != nil {
 		log.Fatalf("Failed to initialize WAF proxy: %v", err)
 	}

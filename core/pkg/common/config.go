@@ -3,6 +3,11 @@ package common
 type Config struct {
 	Server       ServerConfig       `yaml:"server"`
 	RateLimiting RateLimitingConfig `yaml:"rate_limiting"`
+	Security     SecurityConfig     `yaml:"security"`
+}
+
+type SecurityConfig struct {
+	AnomalyThreshold int `yaml:"anomaly_threshold"`
 }
 
 type ServerConfig struct {

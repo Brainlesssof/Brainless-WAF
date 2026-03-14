@@ -40,7 +40,7 @@ async def remove_from_blocklist(
     db: Session = Depends(get_db),
     id: int,
     current_user: models.User = Depends(deps.check_admin)
-) -> Any:
+):
     item = db.query(models.IPList).filter(models.IPList.id == id, models.IPList.list_type == "blocklist").first()
     if not item:
         raise HTTPException(status_code=404, detail="Entry not found in blocklist")
@@ -81,7 +81,7 @@ async def remove_from_allowlist(
     db: Session = Depends(get_db),
     id: int,
     current_user: models.User = Depends(deps.check_admin)
-) -> Any:
+):
     item = db.query(models.IPList).filter(models.IPList.id == id, models.IPList.list_type == "allowlist").first()
     if not item:
         raise HTTPException(status_code=404, detail="Entry not found in allowlist")

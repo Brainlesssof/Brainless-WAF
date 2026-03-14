@@ -30,7 +30,7 @@ func TestProxyForwarding(t *testing.T) {
 	}))
 	defer backend.Close()
 
-	p, err := NewWAFProxy(backend.URL, nil)
+	p, err := NewWAFProxy(backend.URL, nil, nil, nil, 10)
 	if err != nil {
 		t.Fatalf("Failed to create proxy: %v", err)
 	}

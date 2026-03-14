@@ -9,17 +9,20 @@ import (
 	"github.com/brainless-security/brainless-waf/core/pkg/common"
 	"github.com/brainless-security/brainless-waf/core/pkg/limiter"
 	"github.com/brainless-security/brainless-waf/core/pkg/rules"
+	"github.com/brainless-security/brainless-waf/core/pkg/telemetry"
 )
 
 type WAFProxy struct {
-	target  *url.URL
-	proxy   *httputil.ReverseProxy
-	parser  *Parser
-	engine  *rules.Engine
-	limiter *limiter.IPVoiceLimiter
+	target           *url.URL
+	proxy            *httputil.ReverseProxy
+	parser           *Parser
+	engine           *rules.Engine
+	limiter          *limiter.IPVoiceLimiter
+	logger           *telemetry.Logger
+	anomalyThreshold int
 }
 
-func NewWAFProxy(targetURL string, engine *rules.Engine, l *limiter.IPVoiceLimiter) (*WAFProxy, error) {
+func NewWAFProxy(targetURL string, engine *rules.Engine, l *limiter.IPVoiceLimiter, log *telemetry.Logger, threshold int) (*WAFProxy, error) {
 	target, err := url.Parse(targetURL)
 	if err != nil {
 		return nil, err
@@ -27,12 +30,18 @@ func NewWAFProxy(targetURL string, engine *rules.Engine, l *limiter.IPVoiceLimit
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
+	if threshold == 0 {
+		threshold = 10 // Safe default
+	}
+
 	return &WAFProxy{
-		target:  target,
-		proxy:   proxy,
-		parser:  NewParser(),
-		engine:  engine,
-		limiter: l,
+		target:           target,
+		proxy:            proxy,
+		parser:           NewParser(),
+		engine:           engine,
+		limiter:          l,
+		logger:           log,
+		anomalyThreshold: threshold,
 	}, nil
 }
 
@@ -61,14 +70,20 @@ func (p *WAFProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// Handle immediate deny actions
 		if result.Matched && result.Action == "deny" {
+			if p.logger != nil {
+				p.logger.LogMatch(tx, result.Message)
+			}
 			http.Error(w, result.Message, result.Status)
 			return
 		}
 
 		// Handle Anomaly Scoring threshold
-		// Default threshold = 10 (should be configurable)
-		if tx.AnomalyScore >= 10 {
-			http.Error(w, "Inbound Anomaly Score Exceeded", http.StatusForbidden)
+		if tx.AnomalyScore >= p.anomalyThreshold {
+			msg := "Inbound Anomaly Score Exceeded"
+			if p.logger != nil {
+				p.logger.LogMatch(tx, msg)
+			}
+			http.Error(w, msg, http.StatusForbidden)
 			return
 		}
 	}

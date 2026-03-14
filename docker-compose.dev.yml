@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: bwaf-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_DB: brainless_waf
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  management:
+    build:
+      context: ./management
+      dockerfile: Dockerfile
+    container_name: bwaf-management
+    environment:
+      DATABASE_URL: postgresql://admin:changeme@db:5432/brainless_waf
+      SECRET_KEY: 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - ./management:/app
+
+  mock-backend:
+    image: kennethreitz/httpbin
+    container_name: bwaf-mock-backend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:

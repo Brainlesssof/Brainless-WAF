@@ -87,7 +87,7 @@ async def delete_rule(
     id: int,
     current_user: models.User = Depends(deps.check_admin),
     notifier: WafNotifier = Depends(get_notifier)
-) -> Any:
+):
     rule = db.query(models.Rule).filter(models.Rule.id == id).first()
     if not rule:
         raise HTTPException(status_code=404, detail="Rule not found")

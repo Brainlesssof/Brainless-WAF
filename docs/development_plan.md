@@ -34,7 +34,7 @@ This document tracks the granular progress of the Brainless WAF project, organiz
 
 | Task ID | Description | [DEV] | [TEST] | [GIT] | Status |
 | :--- | :--- | :---: | :---: | :---: | :--- |
-| 2.1 | API Foundation (FastAPI + JWT Auth) | [x] | [/] | [x] | COMPLETED |
+| 2.1 | API Foundation (FastAPI + JWT Auth) | [x] | [x] | [x] | COMPLETED |
 | 2.2 | Core Endpoints (Rules, Config, Health) | [x] | [ ] | [x] | COMPLETED |
 | 2.3 | Advanced Endpoints (Events, Stats, IP Lists) | [x] | [ ] | [x] | COMPLETED |
 | 2.4 | gRPC Bridge Notifier (WAF Sync) | [x] | [ ] | [x] | COMPLETED |
